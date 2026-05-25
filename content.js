@@ -223,7 +223,7 @@
           <span class="clowde-percent" id="clowde-percent">0%</span>
         </div>
         <div class="clowde-right">
-          <button class="clowde-fresh-btn" id="clowde-fresh" type="button">Start Fresh</button>
+          <button class="clowde-fresh-btn" id="clowde-fresh" type="button">Generate Handoff</button>
         </div>
       </div>
       <div class="clowde-alert" id="clowde-alert" hidden>
@@ -258,20 +258,84 @@
       .filter((node) => !node.closest(`#${ROOT_ID}`))
       .map((node) => getBestText(node))
       .filter((text) => text.length > 10)
-      .filter((text) => !text.startsWith("I'm continuing a conversation from a previous Claude session"));
+      .filter((text) => !text.startsWith("Before we end this chat"));
 
-    const lastThree = userMessages.slice(-3).join("\n- ");
-    const lastMessage = userMessages.at(-1) || "";
+    const assistantMessages = [...document.querySelectorAll(".standard-markdown")]
+      .filter((node) => !node.closest(`#${ROOT_ID}`))
+      .map((node) => getBestText(node))
+      .filter((text) => text.length > 10);
 
-    return `I'm continuing a conversation from a previous Claude session. Here's the context you need:
+    const recentUserMsgs = userMessages.slice(-5);
+    const recentAssistantMsgs = assistantMessages.slice(-3);
+    const lastTask = userMessages.at(-1) || "";
+    const firstFew = userMessages.slice(0, 3);
 
-**What we were working on:**
-- ${lastThree}
+    const topicSummary = firstFew.map((m) => `- ${m.slice(0, 200)}`).join("\n");
+    const recentWork = recentUserMsgs.map((m) => `- ${m.slice(0, 300)}`).join("\n");
+    const assistantContext = recentAssistantMsgs.map((m) => `- ${m.slice(0, 400)}`).join("\n");
 
-**Current task:**
-${lastMessage}
+    return `Before we end this chat, create a COMPLETE continuity summary of EVERYTHING important from this entire conversation so I can paste it into a new chat and continue seamlessly.
 
-**Continue from here.**`;
+IMPORTANT INSTRUCTIONS:
+- Do NOT make this short.
+- Do NOT overly summarize.
+- Do NOT omit technical details, reasoning, decisions, failed attempts, or unfinished work.
+- Preserve the full context as accurately as possible.
+
+Include:
+- all projects discussed
+- all technical implementations
+- architecture and stack decisions
+- debugging attempts and errors
+- workflow preferences
+- important motivations affecting decisions
+- chronology of how ideas evolved
+- unresolved questions
+- pending tasks
+- next recommended actions
+- exact current status of everything
+
+For coding discussions include:
+- file structure
+- frameworks/tools/apis
+- implementation progress
+- bugs encountered
+- attempted fixes
+- current blockers
+- what still needs to be built
+
+For brainstorming:
+- separate confirmed decisions from speculative ideas.
+
+For strategic discussions:
+- preserve the reasoning behind decisions and tradeoffs.
+
+Structure the output clearly with sections and bullet points so another AI assistant can instantly continue the work without asking repetitive onboarding questions.
+
+At the end include:
+1. Where we left off
+2. Immediate next step
+3. Current blockers
+4. Important context the next assistant must remember
+5. Things the next assistant should NOT repeat or ask again
+
+Treat this as a full state restoration document for continuing an ongoing long-term collaboration.
+
+---
+
+Here is the conversation context for reference:
+
+**Initial topics discussed:**
+${topicSummary}
+
+**Recent user messages:**
+${recentWork}
+
+**Recent assistant responses (summarized):**
+${assistantContext}
+
+**Last active task:**
+${lastTask}`;
   }
 
   function bindEvents() {

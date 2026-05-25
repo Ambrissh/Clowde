@@ -1,96 +1,103 @@
-# Clowde
-### Never lose your Claude context again.
+# ☁️ Clowde
 
-## Why I built this
+**(Claude + Flow = Clowde 😉)**
 
-I built Clowde because Claude.ai does not give you a useful early signal when a conversation is approaching the context limit. By the time Claude shows its own warning, usually around 90% or later, the conversation quality has often already started degrading: shorter answers, repeated explanations, forgotten constraints, and that quiet sense that the model is no longer holding the whole thread.
+> Never lose your Claude context again.
 
-I wanted an early warning system that respects the user's intelligence. Not a panic button, not an onboarding flow, not a dashboard full of fake precision. Just a small bar above the input that says, in effect: your flow matters, and you may want to switch before the work gets brittle.
+Clowde is a tiny Chrome extension that sits right above your Claude.ai input box and watches how full your conversation is getting. When things start getting long, it nudges you to switch chats — and generates a full continuity prompt so the next chat picks up exactly where you left off.
 
-## How it works
+No data ever leaves your browser. No API keys. No tracking. Just a calm little bar protecting your flow.
 
-Clowde runs entirely inside the Chrome extension content script on `claude.ai`. It reads the visible Claude conversation DOM and estimates context pressure locally.
+---
 
-The current algorithm:
+## What it looks like
 
-- Collects user messages with `[class*="font-user-message"]`.
-- Collects assistant responses with `.standard-markdown`.
-- Reads `textContent`, not `innerText`, for token estimation because Chrome's `content-visibility: auto` can make off-screen `innerText` unreliable.
-- Estimates plain text at roughly `chars / 4`.
-- Estimates code blocks at `chars / 4 x 1.5` because code is denser than prose.
-- Adds `+1500` tokens per image.
-- Adds `+800` tokens per estimated document page.
-- Applies a correction multiplier of `2.8x` to compensate for DOM truncation from off-screen messages.
-- Adds a turn count bonus: `min(15, turnCount x 0.2)` to account for conversation complexity.
-- Uses scroll height, turn count, and Claude's own native warning text as proxy signals for already-long conversations on mount.
+When you open any conversation on Claude.ai, Clowde appears as a sleek dark bar above your input:
 
-The final score is:
-
-```text
-min(100, (rawPercent x 2.8) + turnBonus)
+```
+┌──────────────────────────────────────────────────────────┐
+│ ☁ Go, let the learning begin!   ━━━━━━━━━━  92%   [Generate Handoff] │
+├──────────────────────────────────────────────────────────┤
+│ Hey — it's a good time to switch chats.    [Switch Now] [Keep Going]  │
+└──────────────────────────────────────────────────────────┘
 ```
 
-Then Clowde applies a detected floor from proxy signals. For example, a conversation with more than 150 turns is treated as already near the danger zone even if the browser has not rendered all off-screen text yet.
+- **Progress bar** — shows estimated context usage (0–100%)
+- **Generate Handoff** — click anytime to create a continuity prompt
+- **Switch Now** — appears at 80%+, generates a handoff and dismisses the alert
+- **Keep Going** — dismisses the warning if you want to keep pushing
 
-## Algorithm accuracy & known error rate
+---
 
-This is an approximation, not a precise token counter.
+## How to use it
 
-In live Claude DOM testing, the measured average assistant node was around `1,162` characters. The actual visible response length for long assistant answers is often closer to `4,000-5,000` characters. That gives an undercount ratio of roughly `3.4-4.3x`.
+1. **Install Clowde** (see below) and open any conversation on [claude.ai](https://claude.ai).
+2. You'll see the Clowde bar appear above the input box. Click the cloud icon to activate monitoring.
+3. As you chat, the progress bar fills up. Clowde estimates how much of Claude's context window you've used.
+4. **At ~80%**, a gentle alert appears: *"Hey — I think it's a good time to switch chats. Your flow is worth protecting."*
+5. Click **Switch Now** or **Generate Handoff** — Clowde pastes a detailed handoff prompt into the input box.
+6. **Send that message to Claude.** Claude will generate a full continuity summary of everything important from your conversation.
+7. **Copy that summary**, open a new chat, paste it in, and keep going seamlessly.
 
-Clowde currently applies a `2.8x` correction multiplier, then adds a capped turn-count bonus. The residual error is usually around `+/- 15-25%`, depending on the type of conversation. Code-heavy threads, long markdown answers, and chats with many collapsed off-screen nodes are harder to estimate.
+That's it. Your flow stays intact, your context stays fresh, and you never lose track of where you were.
 
-Validation so far:
+---
 
-- Short chat, around 5 turns: shows `3-8%` - accurate.
-- Medium chat, around 30 turns: shows `18-28%` - reasonable.
-- Long chat, 100+ turns and code-heavy: shows `65-80%` - correct range.
-- Very long chat, 150+ turns: shows `85-95%` - triggers warning correctly.
+## The handoff prompt
 
-Clowde intentionally errs toward early warnings.
+When you click **Generate Handoff** or **Switch Now**, Clowde injects this into your input:
 
-A false positive, switching slightly early, costs 30 seconds.
+> *Before we end this chat, create a COMPLETE continuity summary of EVERYTHING important from this entire conversation so I can paste it into a new chat and continue seamlessly.*
+>
+> *Include: all projects discussed, all technical implementations, architecture decisions, debugging attempts, workflow preferences, unresolved questions, pending tasks, next steps, and exact current status.*
+>
+> *At the end include: (1) Where we left off, (2) Immediate next step, (3) Current blockers, (4) Important context the next assistant must remember, (5) Things the next assistant should NOT repeat or ask again.*
 
-A false negative, hitting the limit mid-task, costs your entire flow.
+The prompt also attaches context it scraped from the page — your first few messages (to capture the topic), recent messages (to capture where you are now), and recent assistant responses (to capture decisions already made).
 
-## The DOM limitation problem
+---
 
-Claude.ai uses `content-visibility: auto` to keep long conversations fast. That is good product engineering, but it creates a real limitation for browser extensions: messages outside the viewport may be present as DOM nodes while still returning partial or unreliable layout text.
+## How it estimates context
 
-Clowde works around this by combining several signals:
+Clowde reads the visible conversation DOM and makes a local estimate. It's not a precise tokenizer — it's an intentional early-warning system.
 
-- Text length from `textContent`.
-- Scroll preloading to force more messages to render.
-- Correction multipliers based on measured undercount.
-- Turn count as a structural proxy.
-- Scroll height as a conversation length proxy.
-- Claude's native long-context warning, when present.
+- Counts characters in user and assistant messages, estimates ~4 chars per token
+- Weights code blocks slightly heavier (1.5x)
+- Accounts for images and documents
+- Uses turn count and scroll height as secondary signals
+- Applies a correction multiplier for off-screen messages Chrome doesn't fully render
 
-That means Clowde is not, and does not pretend to be, a perfect tokenizer. A precise counter would require API access or a model-specific tokenizer with full conversation text. Clowde deliberately avoids that because privacy matters more than fake precision here.
+**Clowde intentionally errs early.** A false positive (switching a bit too soon) costs 30 seconds. A false negative (hitting the limit mid-task) costs your entire flow.
+
+---
 
 ## Privacy
 
-Zero data leaves your browser.
+Zero data leaves your browser. No API calls, no telemetry, no analytics. Everything runs locally in the content script.
 
-There are no API calls, no telemetry, no analytics, and no tracking. Everything runs locally in the content script. Clowde does not send your conversation anywhere. It measures text length and structural signals in the page so it can estimate context pressure and generate a local handoff prompt.
+---
 
-## Installation
+## Install
 
-1. Open Chrome and go to `chrome://extensions`.
-2. Turn on Developer mode.
-3. Click Load unpacked.
-4. Select the Clowde extension folder.
-5. Open `https://claude.ai` and start or resume a conversation.
+1. Open Chrome → `chrome://extensions`
+2. Turn on **Developer mode**
+3. Click **Load unpacked**
+4. Select the `clowde` folder
+5. Open [claude.ai](https://claude.ai) and start chatting
+
+---
 
 ## Roadmap
 
-- Firefox support.
-- Configurable warning threshold.
-- Conversation summary quality improvements.
-- Cross-model support for ChatGPT and Gemini.
+- Firefox support
+- Configurable warning threshold
+- Better conversation summaries
+- ChatGPT & Gemini support
+
+---
 
 ## Built by
 
-Ambrissh S. Raghav - 3rd year Physics undergrad at IISER Berhampur, building at the intersection of AI and developer tools.
+**Ambrissh S. Raghav** — 3rd year Physics undergrad at IISER Berhampur, building at the intersection of AI and developer tools.
 
-Find me on GitHub: [github.com/Ambrissh](https://github.com/Ambrissh)
+[github.com/Ambrissh](https://github.com/Ambrissh)
