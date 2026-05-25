@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Clowde",
+  "version": "1.0.0",
+  "description": "Claude + Flow. A calm local handoff companion for protecting long-session context.",
+  "icons": {
+    "16": "icons/clowde-16.png",
+    "48": "icons/clowde-48.png",
+    "128": "icons/clowde-128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://claude.ai/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": [],
+  "host_permissions": ["https://claude.ai/*"]
+}
