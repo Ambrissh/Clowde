@@ -1,10 +1,10 @@
-# ☁️ Clowde
+# ☁️ Clowde - Use CLAUDE Infinitely in the free tier !!
 
 **(Claude + Flow = Clowde 😉)**
 
 > Never lose your Claude context again.
 
-Clowde is a tiny Chrome extension that sits right above your Claude.ai input box and watches how full your conversation is getting. When things start getting long, it nudges you to switch chats — and generates a full continuity prompt so the next chat picks up exactly where you left off.
+Clowde is a tiny Chrome extension that sits right above your Claude.ai input box and watches how full your conversation is getting. When things start getting long, it nudges you to switch chats and generates a full continuity prompt so the next chat picks up exactly where you left off.
 
 No data ever leaves your browser. No API keys. No tracking. Just a calm little bar protecting your flow.
 
@@ -34,7 +34,7 @@ When you open any conversation on Claude.ai, Clowde appears as a sleek dark bar 
 1. **Install Clowde** (see below) and open any conversation on [claude.ai](https://claude.ai).
 2. You'll see the Clowde bar appear above the input box. Click the cloud icon to activate monitoring.
 3. As you chat, the progress bar fills up. Clowde estimates how much of Claude's context window you've used.
-4. **At ~80%**, a gentle alert appears: *"Hey — I think it's a good time to switch chats. Your flow is worth protecting."*
+4. **At ~70-80%**, a gentle alert appears: *"Hey — I think it's a good time to switch chats. Your flow is worth protecting."*
 5. Click **Switch Now** or **Generate Handoff** — Clowde pastes a detailed handoff prompt into the input box.
 6. **Send that message to Claude.** Claude will generate a full continuity summary of everything important from your conversation.
 7. **Copy that summary**, open a new chat, paste it in, and keep going seamlessly.
@@ -59,13 +59,13 @@ The prompt also attaches context it scraped from the page — your first few mes
 
 ## How it estimates context
 
-Clowde reads the visible conversation DOM and makes a local estimate. It's not a precise tokenizer — it's an intentional early-warning system.
+Clowde reads the visible conversation DOM and makes a local estimate. It's not a precise tokeniser — it's an intentional early-warning system.
 
 - Counts characters in user and assistant messages, estimates ~4 chars per token
 - Weights code blocks slightly heavier (1.5x)
 - Accounts for images and documents
 - Uses turn count and scroll height as secondary signals
-- Applies a correction multiplier for off-screen messages Chrome doesn't fully render
+- Applies a correction multiplier for off-screen messages. Chrome doesn't fully render
 
 **Clowde intentionally errs early.** A false positive (switching a bit too soon) costs 30 seconds. A false negative (hitting the limit mid-task) costs your entire flow.
 
@@ -87,17 +87,9 @@ Zero data leaves your browser. No API calls, no telemetry, no analytics. Everyth
 
 ---
 
-## Roadmap
-
-- Firefox support
-- Configurable warning threshold
-- Better conversation summaries
-- ChatGPT & Gemini support
-
----
 
 ## Built by
 
-**Ambrissh S. Raghav** — 3rd year Physics undergrad at IISER Berhampur, building at the intersection of AI and developer tools.
+**Ambrissh S. Raghav** 
 
 [github.com/Ambrissh](https://github.com/Ambrissh)
