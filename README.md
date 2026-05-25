@@ -1,4 +1,4 @@
-# ☁️ Clowde - Use CLAUDE Infinitely in the free tier !!
+# <img src="icons/clowde-48.png" width="32" height="32" alt="Clowde" style="vertical-align: middle;"> Clowde - Use CLAUDE Infinitely in the free tier !!
 
 **(Claude + Flow = Clowde 😉)**
 
@@ -14,13 +14,9 @@ No data ever leaves your browser. No API keys. No tracking. Just a calm little b
 
 When you open any conversation on Claude.ai, Clowde appears as a sleek dark bar above your input:
 
-```
-┌──────────────────────────────────────────────────────────┐
-│ ☁ Go, let the learning begin!   ━━━━━━━━━━  92%   [Generate Handoff] │
-├──────────────────────────────────────────────────────────┤
-│ Hey — it's a good time to switch chats.    [Switch Now] [Keep Going]  │
-└──────────────────────────────────────────────────────────┘
-```
+<p align="center">
+  <img src="assets/clowde-ui.png" alt="Clowde UI" width="600">
+</p>
 
 - **Progress bar** — shows estimated context usage (0–100%)
 - **Generate Handoff** — click anytime to create a continuity prompt
@@ -90,6 +86,6 @@ Zero data leaves your browser. No API calls, no telemetry, no analytics. Everyth
 
 ## Built by
 
-**Ambrissh S. Raghav** 
+**Ambrissh S. Raghav**
 
 [github.com/Ambrissh](https://github.com/Ambrissh)
