@@ -3,6 +3,10 @@
 **(Claude + Flow = Clowde 😉)**
 
 > Never lose your Claude context again.
+> People (including me) love using Claude for how smart and natural it feels, but we all know long chats burn through tokens fast.
+Switching chats helps save tokens, but it also breaks context and kills the flow because you have to rebuild everything again.
+Clowde fixes this by letting you continue across fresh chats without losing your progress, ideas, or conversation memory.
+
 
 Clowde is a tiny Chrome extension that sits right above your Claude.ai input box and watches how full your conversation is getting. When things start getting long, it nudges you to switch chats and generates a full continuity prompt so the next chat picks up exactly where you left off.
 
